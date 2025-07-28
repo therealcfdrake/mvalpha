@@ -1,0 +1,81 @@
+---
+title: "Analysis"
+subtitle: "My subtitle (optional)"
+author: "Name"
+date: "`r format(Sys.time(), '%d %b, %Y')`"
+---
+
+```{r Dependencies, echo=FALSE, include=FALSE}
+
+pacman::p_load("rmarkdown", "tidyverse", "here", "glue")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+
+```{r Paper Examples}
+
+ex_table3 <- tibble::tibble(id = c("U1", "U2", "U3", "U4"), Obs_F = list(c("b", "d"), c("a", "b", "d"), c(), c("a")), Obs_G = list(c("d"), c("b"), c("a"), NA_character_), Obs_H = list(NA_character_, c("b", "d"), c("a"), NA_character_)) |> tibble::column_to_rownames(var = "id")
+
+mv_alpha(ex_table3, clusters = 2) # 0.2866
+
+ex_table8a <- tibble(id = c(1:3), F = list(c("a"), c("a", "b", "d"), c("d")), G = list(c("a"), c("a", "b", "d"), c("d")), H = list(c("a"), c("a", "b", "d", "e"), c("d"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table8a) # 0.947
+
+ex_table8b <- tibble(id = c(1:3), F = list(c("a"), c("a", "b"), c("d")), G = list(c("a"), c("a", "b"), c("d")), H = list(c("a"), c("a", "b", "d"), c("d"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table8b) # 0.923
+
+ex_table8c <- tibble(id = c(1:3), F = list(c("a"), c("b"), c("d")), G = list(c("a"), c("b"), c("d")), H = list(c("a"), c("b", "d"), c("d"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table8c) # 0.895
+
+ex_table9a <- tibble(id = c(1:3), F = list(c("a"), c("a", "b"), c("d")), G = list(c("a"), c("a", "d"), c("d")), H = list(c("a"), c("d", "b"), c("d"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table9a) # 0.716
+
+ex_table9b <- tibble(id = c(1:3), F = list(c("a"), c("a", "b"), c("d")), G = list(c("a"), c("e", "d"), c("d")), H = list(c("a"), c("f"), c("d"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table9b) # 0.554
+
+ex_table9c <- tibble(id = c(1:3), F = list(c("a"), c("a", "b"), c("b", "d")), G = list(c("b"), c("e", "d"), c("d")), H = list(c("a", "b"), c("f"), c("b", "e"))) |> 
+  column_to_rownames("id")
+
+mv_alpha(ex_table9c) # -0.002
+
+
+```
+
+
+```{r}
+
+tags <- letters[1:10]
+
+data <- tibble(unit = 1:20) |> 
+  rowwise() |> 
+  mutate(read1 = list(sample(tags, rpois(1, 1.1) + 1))) |> 
+  mutate(read2 = list(sample(tags, rpois(1, 1.1) + 1))) |> 
+  column_to_rownames("unit")
+
+```
+
+```{r}
+
+mv_alpha(data)
+
+```
+
+
+
+```{r Save Data and Objects}
+
+# saveRDS(output, here("4. Analysis", glue("{params$nb_id}_output.rds"))) #example
+
+```

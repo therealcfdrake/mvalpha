@@ -68,7 +68,8 @@ data <- tibble(unit = 1:20) |>
 
 ```{r}
 
-mv_alpha(data)
+mv_alpha(ex_table3)
+ex_table3 |> View()
 
 ```
 

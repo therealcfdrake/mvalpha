@@ -2,12 +2,11 @@
 #' @export
 #' @import parallel
 
+
 mv_alpha <-
   function(data, type = "nominal", clusters = parallel::detectCores() - 1){
 
     cl <- parallel::makeCluster(clusters)
-
-    parallel::clusterExport(cl, list("set_ops", "metric_delsq_ck", "metric_delta_CK"))
 
     features <- data |> unlist() |> unique() |> sort()
     readers <- colnames(data)
@@ -70,13 +69,10 @@ mv_alpha <-
 
     all_feature_combinations <- # all ways to choose |C| from n_features
       lapply(unique_cardinalities,
-                          function(f){
-                            if(f == 0){"null_set"
-                            }else{
-                              combn(n_features, f)
-                            }
-                          }
-      ) |> stats::setNames(unique_cardinalities)
+        function(f){
+          if(f == 0){"null_set"
+          }else{combn(n_features, f)}
+        }) |> stats::setNames(unique_cardinalities)
 
     # C is a set (vector) of elements
     # K is a set (vector) of elements
@@ -91,7 +87,7 @@ mv_alpha <-
         lapply(unit_values, function(c_ind){
           values_by_unit[c_ind, u] *
             lapply(unit_values, function(k){
-              values_by_unit[k, u] * metric_delta_CK(values[[c_ind]], values[[k]])
+              values_by_unit[k, u] * mvalpha::metric_delta_CK(values[[c_ind]], values[[k]])
             }) |> unlist() |> sum(na.rm = TRUE) # sum over k
         }) |> unlist() |> sum(na.rm = TRUE) |> # sum over c
           (\(x) x / (m[u] - 1))()
@@ -104,14 +100,14 @@ mv_alpha <-
         `C_|C|` <- if(`|C|` == 0)
           {0}else{
           split(all_feature_combinations[[`C_|C|_str`]], col(all_feature_combinations[[`C_|C|_str`]]))}
-        print(`|C|`)
+        print(paste0("|C| = ", `|C|`))
         P[`C_|C|_str`] * # Multiply by proportion of observed sets with cardinality |C|
           vapply(unique_cardinalities, function(`|K|`){
             `K_|K|_str` <- as.character(`|K|`)
             `K_|K|` <- if(`|K|` == 0)
             {0}else{
               split(all_feature_combinations[[`K_|K|_str`]], col(all_feature_combinations[[`K_|K|_str`]]))}
-            print(`|K|`)
+            print(paste0("|K| = ", `|K|`))
             denominator <-
               parallel::parLapply(cl, `C_|C|`, function(C_inner)
               {
@@ -120,7 +116,7 @@ mv_alpha <-
                 {
                   K_inner <- unlist(K_inner)
 
-                  inner_set_ops <- set_ops(K_inner, C_inner)
+                  inner_set_ops <- mvalpha::set_ops(K_inner, C_inner)
 
                   prod(n_c_w[C_inner + null_set_observed], na.rm = TRUE) * # prod c in C
                     prod(n_c_w[inner_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
@@ -134,14 +130,14 @@ mv_alpha <-
                 lapply(`K_|K|`, function(K_outer){
                   K_outer <- unlist(K_outer)
 
-                  outer_set_ops <- set_ops(K_outer, C_outer)
+                  outer_set_ops <- mvalpha::set_ops(K_outer, C_outer)
 
                   numerator <-
                     prod(n_c_w[C_outer + null_set_observed], na.rm = TRUE) * # prod c in C
                     prod(n_c_w[outer_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
                     prod(n_c_w[outer_set_ops$A_intersect_B + null_set_observed] - 1, na.rm = TRUE) # prod intersect C and K
 
-                  numerator / denominator * metric_delta_CK(C_outer, K_outer, "nominal")
+                  numerator / denominator * mvalpha::metric_delta_CK(C_outer, K_outer, "nominal")
 
                 }) |> unlist() |> sum(na.rm = TRUE) # sum over K_outer of cardinality |K|
               }) |> unlist() |> sum(na.rm = TRUE) # sum over C_outer of cardinality |C|
@@ -154,10 +150,32 @@ mv_alpha <-
 
     return(list(
       result = result,
+      mvDo = mvDo,
+      mvDe = mvDe,
       unique_cardinalities = unique_cardinalities,
       features = features,
       units = units,
-      readers = readers
+      readers = readers,
+      data = data
     ))
 
   }
+
+
+boot_mv_alpha <-
+  function(){
+    mvDo <-
+      vapply(units[which(m > 0)], function(u){
+        unit_values <- value_names[which(values_by_unit[, u] > 0)]
+        lapply(unit_values, function(c_ind){
+          values_by_unit[c_ind, u] *
+            lapply(unit_values, function(k){
+              values_by_unit[k, u] * mvalpha::metric_delta_CK(values[[c_ind]], values[[k]])
+            }) |> unlist() |> sum(na.rm = TRUE) # sum over k
+        }) |> unlist() |> sum(na.rm = TRUE) |> # sum over c
+          (\(x) x / (m[u] - 1))()
+      }, 1) |> sum(na.rm = TRUE) |> # sum over u
+      (\(x) x / n..)()
+  }
+
+

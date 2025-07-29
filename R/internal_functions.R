@@ -1,3 +1,5 @@
+#' @export
+
 set_ops <-
   function (A, B) {
 
@@ -17,16 +19,17 @@ set_ops <-
     )
   }
 
+#' @export
 
 metric_delta_CK <-
   function(C, K, type = "nominal"){
 
-    tmp <- set_ops(C, K)
+    tmp <- mvalpha::set_ops(C, K)
 
     lhs_numerator <-
       vapply(C, FUN = function(c_ind){
         vapply(tmp$B_diff_A, FUN = function(k){
-          metric_delsq_ck(c_ind, k, type = type)
+          mvalpha::metric_delsq_ck(c_ind, k, type = type)
         }, 1) |> sum(na.rm = TRUE) # sum over k
       }, 1) |> sum(na.rm = TRUE) |> # sum over c
       (\(x) x / length(C))()
@@ -34,7 +37,7 @@ metric_delta_CK <-
     rhs_numerator <-
       vapply(tmp$A_diff_B, FUN = function(c_ind){
         vapply(K, FUN = function(k){
-          metric_delsq_ck(c_ind, k, type = type)
+          mvalpha::metric_delsq_ck(c_ind, k, type = type)
         }, 1) |> sum(na.rm = TRUE) # sum over k
       }, 1) |> sum(na.rm = TRUE) |> # sum over c
       (\(x) x / length(K))()
@@ -59,6 +62,9 @@ metric_delta_CK <-
 
   }
 
+
+
+#' @export
 
 metric_delsq_ck <-
   function(c, k, type = "nominal"){

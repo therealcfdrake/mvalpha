@@ -74,6 +74,9 @@ mv_alpha <-
           }else{combn(n_features, f)}
         }) |> stats::setNames(unique_cardinalities)
 
+    n_combinations <- lapply(all_feature_combinations, ncol)
+    CK_combns <- sum()
+
     # C is a set (vector) of elements
     # K is a set (vector) of elements
     # |C| is an integer
@@ -87,7 +90,7 @@ mv_alpha <-
         lapply(unit_values, function(c_ind){
           values_by_unit[c_ind, u] *
             lapply(unit_values, function(k){
-              values_by_unit[k, u] * mvalpha::metric_delta_CK(values[[c_ind]], values[[k]])
+              values_by_unit[k, u] * mvalpha::metric_delta_CK(values[[c_ind]], values[[k]], mvalpha::set_ops(values[[k]], values[[c_ind]]))
             }) |> unlist() |> sum(na.rm = TRUE) # sum over k
         }) |> unlist() |> sum(na.rm = TRUE) |> # sum over c
           (\(x) x / (m[u] - 1))()
@@ -108,39 +111,32 @@ mv_alpha <-
             {0}else{
               split(all_feature_combinations[[`K_|K|_str`]], col(all_feature_combinations[[`K_|K|_str`]]))}
             print(paste0("|K| = ", `|K|`))
-            denominator <-
-              parallel::parLapply(cl, `C_|C|`, function(C_inner)
-              {
-                C_inner <- unlist(C_inner)
-                lapply(`K_|K|`, function(K_inner)
-                {
-                  K_inner <- unlist(K_inner)
 
-                  inner_set_ops <- mvalpha::set_ops(K_inner, C_inner)
+            prods_and_metrics <-
+              parallel::parLapply(cl, `C_|C|`, function(C){
+                C <- unlist(C)
+                lapply(`K_|K|`, function(K){
+                  K <- unlist(K)
 
-                  prod(n_c_w[C_inner + null_set_observed], na.rm = TRUE) * # prod c in C
-                    prod(n_c_w[inner_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
-                    prod(n_c_w[inner_set_ops$A_intersect_B + null_set_observed] - 1, na.rm = TRUE) # prod intersect C and K
-                }) |> unlist() |> sum(na.rm = TRUE) # sum over K of cardinality |K|
-              }) |> unlist() |> sum(na.rm = TRUE) # sum over C of cardinality |C|
+                  inner_set_ops <- mvalpha::set_ops(K, C)
+
+                  prod_ns <-
+                    prod(n_c_w[C + null_set_observed], na.rm = TRUE) * # prod c in C
+                      prod(n_c_w[inner_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
+                      prod(n_c_w[inner_set_ops$A_intersect_B + null_set_observed] - 1, na.rm = TRUE) # prod intersect C and K
+
+                  metric <- mvalpha::metric_delta_CK(C, K, inner_set_ops, "nominal")
+
+                  c(prod_ns, metric)
+
+                }) |> do.call(rbind, args = _) # calculate over K of cardinality |K|
+              }) |> do.call(rbind, args = _) # calculate over C of cardinality |C|
+
 
             P[`K_|K|_str`] *  # Multiply by proportion of observed sets with cardinality |K|
-              parallel::parLapply(cl, `C_|C|`, function(C_outer){
-                C_outer <- unlist(C_outer)
-                lapply(`K_|K|`, function(K_outer){
-                  K_outer <- unlist(K_outer)
+              sum(prods_and_metrics[, 1] * prods_and_metrics[, 2]) /
+              sum(prods_and_metrics[, 1])
 
-                  outer_set_ops <- mvalpha::set_ops(K_outer, C_outer)
-
-                  numerator <-
-                    prod(n_c_w[C_outer + null_set_observed], na.rm = TRUE) * # prod c in C
-                    prod(n_c_w[outer_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
-                    prod(n_c_w[outer_set_ops$A_intersect_B + null_set_observed] - 1, na.rm = TRUE) # prod intersect C and K
-
-                  numerator / denominator * mvalpha::metric_delta_CK(C_outer, K_outer, "nominal")
-
-                }) |> unlist() |> sum(na.rm = TRUE) # sum over K_outer of cardinality |K|
-              }) |> unlist() |> sum(na.rm = TRUE) # sum over C_outer of cardinality |C|
           }, 1) |> sum(na.rm = TRUE) # sum over |K|
       }, 1) |> sum(na.rm = TRUE) # sum over |C|
 

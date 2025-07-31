@@ -22,20 +22,20 @@ set_ops <-
 #' @export
 
 metric_delta_CK <-
-  function(C, K, type = "nominal"){
+  function(C, K, CK_set_ops, type = "nominal"){
 
-    tmp <- mvalpha::set_ops(C, K)
+    # tmp <- mvalpha::set_ops(C, K)
 
     lhs_numerator <-
       vapply(C, FUN = function(c_ind){
-        vapply(tmp$B_diff_A, FUN = function(k){
+        vapply(CK_set_ops$A_diff_B, FUN = function(k){
           mvalpha::metric_delsq_ck(c_ind, k, type = type)
         }, 1) |> sum(na.rm = TRUE) # sum over k
       }, 1) |> sum(na.rm = TRUE) |> # sum over c
       (\(x) x / length(C))()
 
     rhs_numerator <-
-      vapply(tmp$A_diff_B, FUN = function(c_ind){
+      vapply(CK_set_ops$B_diff_A, FUN = function(c_ind){
         vapply(K, FUN = function(k){
           mvalpha::metric_delsq_ck(c_ind, k, type = type)
         }, 1) |> sum(na.rm = TRUE) # sum over k

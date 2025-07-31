@@ -22,36 +22,28 @@ set_ops <-
 #' @export
 
 metric_delta_CK <-
-  function(C, K, CK_set_ops, type = "nominal"){
+  function(C, K, KC_set_ops, type = "nominal"){
 
-    # tmp <- mvalpha::set_ops(C, K)
+    if(rlang::is_empty(C)){lhs_numerator <- 0}else{
+      lhs_numerator <-
+        outer(C, KC_set_ops$A_diff_B, mvalpha::metric_delsq_ck, type = type) |>
+        sum(na.rm = TRUE) |>
+        (\(x) x / length(C))()
+    }
 
-    lhs_numerator <-
-      vapply(C, FUN = function(c_ind){
-        vapply(CK_set_ops$A_diff_B, FUN = function(k){
-          mvalpha::metric_delsq_ck(c_ind, k, type = type)
-        }, 1) |> sum(na.rm = TRUE) # sum over k
-      }, 1) |> sum(na.rm = TRUE) |> # sum over c
-      (\(x) x / length(C))()
-
-    rhs_numerator <-
-      vapply(CK_set_ops$B_diff_A, FUN = function(c_ind){
-        vapply(K, FUN = function(k){
-          mvalpha::metric_delsq_ck(c_ind, k, type = type)
-        }, 1) |> sum(na.rm = TRUE) # sum over k
-      }, 1) |> sum(na.rm = TRUE) |> # sum over c
-      (\(x) x / length(K))()
+    if(rlang::is_empty(K)){rhs_numerator <- 0}else{
+      rhs_numerator <-
+        outer(K, KC_set_ops$B_diff_A, mvalpha::metric_delsq_ck, type = type) |>
+        sum(na.rm = TRUE) |>
+        (\(x) x / length(K))()
+    }
 
     denominator <- length(C) + length(K)
-
-    if(length(C) == 0 | purrr::is_empty(C)) lhs_numerator <- 0
-    if(length(K) == 0 | purrr::is_empty(K)) rhs_numerator <- 0
-    if((length(C) == 0 | purrr::is_empty(C)) & (length(K) == 0 | purrr::is_empty(K))) denominator <- 0
 
     if(lhs_numerator == 0 & rhs_numerator == 0 & denominator == 0){
       result <- 0
     }else{
-      if((length(C) == 0 | purrr::is_empty(C)) | (length(K) == 0 | purrr::is_empty(K))){
+      if((rlang::is_empty(C)) | rlang::is_empty(K)){
         result <- 1
       }else{
         result <- (lhs_numerator + rhs_numerator) / denominator
@@ -93,3 +85,43 @@ metric_delsq_ck <-
 #       }, 1) |> sum(na.rm = TRUE) # sum over k
 #     }, 1) |> sum(na.rm = TRUE) |> # sum over c
 #     (\(x) x / (n.. * (n.. - 1)))()
+
+
+# metric_delta_CK_old <-
+#   function(C, K, KC_set_ops, type = "nominal"){
+#
+#     lhs_numerator <-
+#       vapply(C, FUN = function(c_ind){
+#         vapply(KC_set_ops$A_diff_B, FUN = function(k){
+#           mvalpha::metric_delsq_ck(c_ind, k, type = type)
+#         }, 1) |> sum(na.rm = TRUE) # sum over k
+#       }, 1) |> sum(na.rm = TRUE) |> # sum over c
+#       (\(x) x / length(C))()
+#
+#     rhs_numerator <-
+#       vapply(KC_set_ops$B_diff_A, FUN = function(c_ind){
+#         vapply(K, FUN = function(k){
+#           mvalpha::metric_delsq_ck(c_ind, k, type = type)
+#         }, 1) |> sum(na.rm = TRUE) # sum over k
+#       }, 1) |> sum(na.rm = TRUE) |> # sum over c
+#       (\(x) x / length(K))()
+#
+#     denominator <- length(C) + length(K)
+#
+#     if(length(C) == 0 | purrr::is_empty(C)) lhs_numerator <- 0
+#     if(length(K) == 0 | purrr::is_empty(K)) rhs_numerator <- 0
+#     if((length(C) == 0 | purrr::is_empty(C)) & (length(K) == 0 | purrr::is_empty(K))) denominator <- 0
+#
+#     if(lhs_numerator == 0 & rhs_numerator == 0 & denominator == 0){
+#       result <- 0
+#     }else{
+#       if((length(C) == 0 | purrr::is_empty(C)) | (length(K) == 0 | purrr::is_empty(K))){
+#         result <- 1
+#       }else{
+#         result <- (lhs_numerator + rhs_numerator) / denominator
+#       }
+#     }
+#
+#     return(result)
+#
+#   }

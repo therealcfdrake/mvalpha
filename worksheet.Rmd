@@ -68,11 +68,87 @@ data <- tibble(unit = 1:20) |>
 
 ```{r}
 
-mv_alpha(ex_table3)
-ex_table3 |> View()
+mv_alpha(ex_table3, verbose = TRUE, n_boot = NULL, parallelize = FALSE)
+mv_alpha(ex_table3, verbose = FALSE, n_boot = NULL, parallelize = FALSE)
+mv_alpha(ex_table3, verbose = TRUE, n_boot = NULL, parallelize = TRUE, cluster_size = 2)
+mv_alpha(ex_table3, verbose = FALSE, n_boot = NULL, parallelize = TRUE)
+mv_alpha(ex_table3, verbose = TRUE, n_boot = 10, parallelize = FALSE)
+mv_alpha(ex_table3, verbose = FALSE, n_boot = 10, parallelize = FALSE)
+mv_alpha(ex_table3, verbose = TRUE, n_boot = 10, parallelize = TRUE)
+mv_alpha(ex_table3, verbose = FALSE, n_boot = 10, parallelize = TRUE, cluster_size = 6)
+
+mv_alpha(ex_table8b, verbose = TRUE, n_boot = 10, parallelize = FALSE)
 
 ```
 
+```{r}
+
+
+generate_mv_data <- 
+  function(n_units = 100, n_readers = 3, n_values = 10, mean_values = 2, se = 0.70, sp = 0.95){
+    
+    values <- letters[1:n_values]
+    latent_label <- lapply(1:n_units, function(i){sample(values, min(rpois(1, mean_values), n_values))})
+
+    lapply(1:n_readers, function(r){
+      lapply(latent_label, function(u){
+        probs <- c(rep(se, length(u)), rep(1 - sp, n_values - length(u)))
+        c(values[which(values %in% u)], values[which(!values %in% u)])[rbinom(n_values, 1, prob = probs) == 1]
+      })
+    }) |> do.call(cbind, args = _)
+    
+  }
+
+test_data <- 
+  generate_mv_data()
+
+
+test_data
+
+apply(test_data, c(1, 2), FUN = function(x){
+  if(length(unlist(x)) > 0){paste0(unlist(x), collapse = "|")}else{"|"}}) |> 
+  data.frame() |> write.csv("test_data.csv", row.names = FALSE)
+
+apply(ex_table3, c(1, 2), FUN = function(x){
+  if(length(unlist(x)) == 0){"|"}else{
+    if(all(is.na(unlist(x)))){""}else{
+    paste0(unlist(x), collapse = "|")}}}) |> 
+  data.frame() |> write.csv("ex_table3.csv", row.names = FALSE)
+
+
+```
+
+```{r}
+install.packages("tictoc")
+
+tictoc::tic()
+# mv_alpha(test_data, verbose = FALSE) # 10.48
+mv_alpha(test_data, verbose = FALSE, parallelize = TRUE) # 
+tictoc::toc()
+
+```
+
+```{r}
+
+library(tidyverse)
+tmp <- mv_alpha(ex_table3, n_boot = 10000)
+
+ggplot(tibble(x = tmp$bootstrap_mvalpha), aes(x = x)) +
+  geom_histogram(binwidth = 0.03, boundary = 0) +
+  geom_vline(xintercept = tmp$mvalpha)
+
+
+
+
+```
+
+```{r}
+
+1+10+45+120+210+252+10+100+450+1200+2100+2520+45+450+2025+5400+9450+11340+120+1200+5400+14400+25200+30240+210+2100+9450+25200+44100+52920+252+2520+11340+30240+52920+63504
+
+0.4302197468948802 - 0.4258444
+
+```
 
 
 ```{r Save Data and Objects}

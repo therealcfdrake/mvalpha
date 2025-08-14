@@ -24,6 +24,17 @@ set_ops <-
 metric_delta_CK <-
   function(C, K, KC_set_ops, type = "nominal"){
 
+    if(type == "nominal"){
+      if(rlang::is_empty(C) & rlang::is_empty(K)){
+        return(0)
+      }else{
+        result <-
+          1 - (length(KC_set_ops$A_intersect_B) /
+                 ((length(C) + length(K)) / 2))
+        return(result)
+      }
+    }
+
     if(rlang::is_empty(C)){lhs_numerator <- 0}else{
       lhs_numerator <-
         outer(C, KC_set_ops$A_diff_B, mvalpha::metric_delsq_ck, type = type) |>

@@ -18,7 +18,7 @@ mv_alpha <-
             prod(n_c_w[C + null_set_observed], na.rm = TRUE) * # prod c in C
             prod(n_c_w[inner_set_ops$A_diff_B + null_set_observed], na.rm = TRUE) * # prod unique k in K
             prod(n_c_w[inner_set_ops$A_intersect_B + null_set_observed] - 1, na.rm = TRUE) # prod intersect C and K
-          metric <- mvalpha::metric_delta_CK(C, K, inner_set_ops, type = type)
+          metric <- metric_delta_CK(C, K, inner_set_ops, type = type)
           c(prod_ns, metric)
         }) |> do.call(rbind, args = _) # calculate over K of cardinality |K|
       }
@@ -123,7 +123,7 @@ mv_alpha <-
     dist_CK <- # distances between C-K pairs
       lapply(values, function(C){
         lapply(values, function(K){
-          mvalpha::metric_delta_CK(C, K, mvalpha::set_ops(K, C), type = type)
+          metric_delta_CK(C, K, mvalpha::set_ops(K, C), type = type)
         }) |> unlist()
       }) |> do.call(cbind, args = _)
 

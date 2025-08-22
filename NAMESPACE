@@ -2,6 +2,6 @@
 
 export(metric_delsq_ck)
 export(metric_delta_CK)
-export(mv_alpha)
+export(mvalpha)
 export(set_ops)
 import(parallel)

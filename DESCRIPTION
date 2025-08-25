@@ -1,19 +1,29 @@
 Package: mvalpha
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
+Title: Calculate Krippendorff's Alpha for Multi-Valued Data
+Version: 0.5.0
 Authors@R: c(
     person(
       "Corie", "Drake",
-      email = "corie-drake@idexx.com",
+      email = "therealcfdrake@gmail.com",
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: Calculate Krippendorff's alpha for multi-valued data using the methods 
+    introduced by Krippendorff and Craggs (2016) <doi:10.1080/19312458.2016.1228863>.
+    Nominal, ordinal, interval, and ratio data types are supported, with options to 
+    create bootstrapped estimates and parallelize calculations.
+Roxygen: list(markdown = TRUE)
+License: GPL (>= 3)
 Encoding: UTF-8
-LazyData: true
+URL: https://github.com/therealcfdrake/mvalpha
+BugReports: https://github.com/therealcfdrake/mvalpha/issues
 Depends: 
     R (>= 3.5)
 RoxygenNote: 7.3.2
+LazyData: true
+Imports:
+  stats,
+  parallel,
+  utils,
+  rlang

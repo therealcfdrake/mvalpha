@@ -137,6 +137,7 @@ mvalpha <-
     n_features <- length(features)
     n_readers <- length(readers)
     n_units <- length(units)
+    continuous_data <- type %in% c("interval", "ratio")
 
     feature_array <- # indicator array for features by reader and unit
       apply(data, MARGIN = c(1, 2),
@@ -210,6 +211,10 @@ mvalpha <-
       stats::setNames(unique_cardinalities)
 
     n_feature_combinations <- lapply(all_feature_combinations, ncol) |> unlist()
+
+    if(continuous_data){lapply(all_feature_combinations, function(`|H|`){
+      matrix(features[`|H|`], nrow = nrow(`|H|`))
+    })}
 
     p_CK <- # probabilities of the observed coincidence of C-K pairs
       lapply(value_names, function(C){

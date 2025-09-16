@@ -14,19 +14,19 @@ mvalpha(
 )
 }
 \arguments{
-\item{data}{a tibble containing a list column for each coder. Each row represents
-an observation unit, and each cell contains a vector of 0 to many values. \code{NA} values
-are used to represent missing observations and \code{NULL} values represent the null set
-response.}
+\item{data}{a data frame containing a list column for each observer. Each row represents
+an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
+number of unique values found in the data set. \code{NA} values are used to represent
+missing observations and \code{NULL} values represent the empty set, {}, of responses.}
 
 \item{type}{a string describing the data type of the label set. This can be "nominal",
 "ordinal", "interval", or "ratio" and is used to select the appropriate distance metric.}
 
 \item{verbose}{a logical value which toggles whether status updates are printed to
-the console.}
+the console while alpha is being calculated.}
 
-\item{n_boot}{an integer representing the number of bootstrapped estimates to calculate
-for mvDo. The default, \code{NULL}, will not generate bootstrapped estimates.}
+\item{n_boot}{an integer representing the number of bootstrap estimates to calculate
+for mvDo. The default, \code{NULL}, will not generate additional estimates.}
 
 \item{parallelize}{a logical value indicating whether to implement parallelization
 using the \code{parallel} package.}
@@ -35,6 +35,36 @@ using the \code{parallel} package.}
 If \code{NULL} and \code{parallelize = TRUE}, then the maximum number of available cores minus 1 will
 be used.}
 }
+\value{
+An object of class \code{mvalpha}
+}
 \description{
-\code{mvalpha()} calculates Krippendorff's alpha statistic for multi-valued data sets.
+\code{mvalpha()} calculates Krippendorff's alpha statistic when multi-valued observers are
+allowed to apply multiple values to an observation.
+}
+\examples{
+library(mvalpha)
+
+### replicate example from Table 3 in Krippendoff and Craggs (2016) with bootstrapped estimates
+
+# View data
+ex_table3
+
+# Estimate alpha
+x <- mvalpha(ex_table3, verbose = TRUE, n_boot = 500)
+
+# View result
+x
+
+# View the unique values observed in the data
+x$values
+
+# View the unique labels used to code the data
+x$labels
+
+# Histogram of bootstrapped estimates
+hist(x$bootstrap_mvalpha)
+}
+\references{
+\insertRef{Krippendorff-Craggs-2016}{mvalpha}
 }

@@ -11,7 +11,7 @@
 \alias{ex_table9c}
 \title{Published Examples}
 \format{
-Each is a multi-valued nominal set with readers as columns and units
+Each is a multi-valued nominal set with observers as columns and units
 as rows.
 }
 \source{
@@ -33,8 +33,7 @@ ex_table9b
 ex_table9c
 }
 \description{
-These data sets represent the examples found in
-and can be used to confirm the
-accurate calculation of alpha.
+These data represent examples found in the original paper describing the calculation of multi-valued Krippendorff's alpha by
+Krippendorff and Craggs (2016).
 }
 \keyword{datasets}

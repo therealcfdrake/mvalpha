@@ -1,33 +1,37 @@
 
 #' Estimate Multi-Valued Krippendorff's Alpha
 #'
-#' `mvalpha()` calculates Krippendorff's alpha statistic for multi-valued data sets.
+#' `mvalpha()` calculates Krippendorff's alpha statistic when multi-valued observers are
+#' allowed to apply multiple values to an observation.
 #'
-#' @param data a tibble containing a list column for each coder. Each row represents
-#' an observation unit, and each cell contains a vector of 0 to many values. `NA` values
-#' are used to represent missing observations and `NULL` values represent the null set
-#' response.
+#' @param data a data frame containing a list column for each observer. Each row represents
+#' an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
+#' number of unique values found in the data set. `NA` values are used to represent
+#' missing observations and `NULL` values represent the empty set, {}, of responses.
 #' @param type a string describing the data type of the label set. This can be "nominal",
 #' "ordinal", "interval", or "ratio" and is used to select the appropriate distance metric.
 #' @param verbose a logical value which toggles whether status updates are printed to
-#' the console.
-#' @param n_boot an integer representing the number of bootstrapped estimates to calculate
-#' for mvDo. The default, `NULL`, will not generate bootstrapped estimates.
+#' the console while alpha is being calculated.
+#' @param n_boot an integer representing the number of bootstrap estimates to calculate
+#' for mvDo. The default, `NULL`, will not generate additional estimates.
 #' @param parallelize a logical value indicating whether to implement parallelization
 #' using the `parallel` package.
 #' @param cluster_size an integer describing the number of cores to allocate to parallelization.
 #' If `NULL` and `parallelize = TRUE`, then the maximum number of available cores minus 1 will
 #' be used.
-#'
+#' @returns An object of class `mvalpha`
 #' @export
+#' @example man/examples/mvalpha_example.R
+#' @references
+#' \insertRef{Krippendorff-Craggs-2016}{mvalpha}
 #' @import parallel
+#' @importFrom Rdpack reprompt
 #' @importFrom stats na.omit setNames
 #' @importFrom utils combn head tail
 
 
 mvalpha <-
   function(data, type = "nominal", verbose = TRUE, n_boot = NULL, parallelize = FALSE, cluster_size = NULL){
-
 
     calc_prods_and_metrics <-
       function(C, `K_|K|`){
@@ -48,7 +52,6 @@ mvalpha <-
             sum()
         }, 1) |> sum() * 2 / n..
       }
-
 
     metric_delta_CK <-
       function(C, K, KC_set_ops){
@@ -88,30 +91,27 @@ mvalpha <-
     nominal_delsq_ck <-
       function(c, k){as.numeric(!(c == k))}
 
-
-### need to accept raw value and index
     ordinal_delsq_ck <-
       Vectorize(
         function(c, k){
-          if(is.character(c)) c <- match(values[c], features)
-          if(is.character(k)) k <- match(values[k], features)
+          if(is.character(c)) c <- match(values[c], labels)
+          if(is.character(k)) k <- match(values[k], labels)
           ((sum(n_c_w[c:k]) - ((n_c_w[c] + n_c_w[k]) / 2)) /
               (n.. - (n_c_last + n_c_first) / 2)) ^ 2
         },
         vectorize.args = c("c", "k")
       )
 
-######## NEED TO FIX FOR mvDe, replace all_feature_combinations indicies with values
     interval_delsq_ck <-
       function(c, k){
         ((c - k) / (c_max - c_min)) ^ 2
       }
 
-    ratio_delsq_ck <- #
+    ratio_delsq_ck <-
       function(c, k){
         ((c - k) / (c + k)) ^ 2
       }
-#####
+
     # Select appropriate metric
 
     metric_delsq_ck <-
@@ -131,33 +131,33 @@ mvalpha <-
 
     # Summary vectors and tables used to organize data
 
-    features <- data |> unlist() |> unique() |> sort()
-    readers <- colnames(data)
+    labels <- data |> unlist() |> unique() |> sort()
+    observers <- colnames(data)
     units <- rownames(data)
-    n_features <- length(features)
-    n_readers <- length(readers)
+    n_labels <- length(labels)
+    n_observers <- length(observers)
     n_units <- length(units)
-    continuous_data <- type %in% c("interval", "ratio")
+    continuous_data <- type %in% c("interval", "ratio") # logical
 
-    feature_array <- # indicator array for features by reader and unit
+    label_array <- # indicator array for labels by observer and unit
       apply(data, MARGIN = c(1, 2),
             function(x){
-              if(!is.na(x)){as.numeric(features %in% unlist(x))
+              if(!is.na(x)){as.numeric(labels %in% unlist(x))
               }else{
-                rep(NA, length(features))
+                rep(NA, length(labels))
               }
             }) |>
       aperm(c(2, 3, 1))
 
-    dimnames(feature_array) <- list(unit = units, reader = readers, feature = features)
+    dimnames(label_array) <- list(unit = units, observer = observers, label = labels)
 
-    values_def <- apply(feature_array, 3, rbind) |> unique(MARGIN = 1) |> stats::na.omit()
+    values_def <- apply(label_array, 3, rbind) |> unique(MARGIN = 1) |> stats::na.omit()
     n_values <- nrow(values_def)
 
     values <- apply(values_def, MARGIN = 1, function(x){
       if(type == "nominal"){x[which(x == 1)] |> names()}
-      else{x[which(x == 1)] |> names() |> as.numeric()}}
-      )
+      else{x[which(x == 1)] |> names() |> as.numeric()}})
+
     value_names <- values |> lapply(function(x){paste0("{", paste0(x, collapse = ", "), "}")}) |> unlist() |> unname()
     names(values) <- value_names
 
@@ -165,14 +165,14 @@ mvalpha <-
 
     values_by_unit <- # create value-by-unit matrix
       apply(values_def, MARGIN = 1, function(v){
-        apply(feature_array, MARGIN = 1, function(x){
+        apply(label_array, MARGIN = 1, function(x){
           apply(x, MARGIN = 1, function(r){
             all(v==r)
           }) |> sum(na.rm = TRUE)
         })
       }) |> t() |> unname()
 
-    dimnames(values_by_unit) <- (list(value = value_names, unit = units))
+    dimnames(values_by_unit) <- list(value = value_names, unit = units)
 
     m <- colSums(values_by_unit)
     m[which(m<2)] <- 0 # remove non-pairable observations
@@ -190,14 +190,14 @@ mvalpha <-
     n_c_w <- colSums(values_def * n)
     if(null_set_observed) n_c_w <- c(null_set = 1, n_c_w)
 
-    if(type == "ordinal"){
+    if(type == "ordinal"){ # define additional variables needed for ordinal metric
       n_c_first <- utils::head(n_c_w, n = 1)
       n_c_last <- utils::tail(n_c_w, n = 1)
     }
 
-    if(type == "interval"){
-      c_min <- min(features)
-      c_max <- max(features)
+    if(type == "interval"){ # define additional variables needed for interval metric
+      c_min <- min(labels)
+      c_max <- max(labels)
     }
 
     P <- # probability of observing a label set of cardinality |C|
@@ -205,15 +205,15 @@ mvalpha <-
         sum(n[which(value_cardinalities == x)]) / n..
       }, 1) |> stats::setNames(unique_cardinalities)
 
-    all_feature_combinations <- # all ways to choose |C| from n_features
+    all_label_combinations <- # generate all ways to choose |C| from n_labels
       lapply(unique_cardinalities,
-        function(f){if(f == 0){utils::combn(1, 1)}else{utils::combn(n_features, f)}}) |>
+        function(f){if(f == 0){utils::combn(1, 1)}else{utils::combn(n_labels, f)}}) |>
       stats::setNames(unique_cardinalities)
 
-    n_feature_combinations <- lapply(all_feature_combinations, ncol) |> unlist()
+    n_label_combinations <- lapply(all_label_combinations, ncol) |> unlist()
 
-    if(continuous_data){lapply(all_feature_combinations, function(`|H|`){
-      matrix(features[`|H|`], nrow = nrow(`|H|`))
+    if(continuous_data){lapply(all_label_combinations, function(`|H|`){ # redefine indicator combinations using actual values if data are continuous
+      matrix(labels[`|H|`], nrow = nrow(`|H|`))
     })}
 
     p_CK <- # probabilities of the observed coincidence of C-K pairs
@@ -238,12 +238,12 @@ mvalpha <-
 
     if(verbose){cat(
       paste0("n Units: ", n_units, "\n",
-             "n Readers: ", n_readers, "\n",
-             "n Features: ", n_features, "\n",
+             "n Observers: ", n_observers, "\n",
+             "n Labels: ", n_labels, "\n",
              "n Values: ", n_values, "\n",
              "Max Cardinality: ", max(unique_cardinalities), "\n",
              "Possible C-K pairs: ",
-             (n_feature_combinations %*% t(n_feature_combinations)) |>
+             (n_label_combinations %*% t(n_label_combinations)) |>
                (\(m) m[upper.tri(m, diag = TRUE)])() |>
                sum() |> prettyNum(big.mark = ","),
              "\n"
@@ -252,7 +252,7 @@ mvalpha <-
     # Notation:
     # C is a set (vector) of elements
     # |C| is the cardinality (integer) of set C
-    # C_|C| is a list of sets (vectors) with cardinality |C|
+    # C_|C| is the collection (list) of sets with cardinality |C|
 
     mvDo <- sum(p_CK * dist_CK)
 
@@ -260,18 +260,18 @@ mvalpha <-
       vapply(unique_cardinalities, function(`|C|`){
         `|C|_str` <- as.character(`|C|`)
         `C_|C|` <- if(`|C|` == 0){0}
-        else{split(all_feature_combinations[[`|C|_str`]], col(all_feature_combinations[[`|C|_str`]]))}
+        else{split(all_label_combinations[[`|C|_str`]], col(all_label_combinations[[`|C|_str`]]))}
 
         vapply(unique_cardinalities[which(unique_cardinalities >= `|C|`)], function(`|K|`){
           `|K|_str` <- as.character(`|K|`)
           `K_|K|` <- if(`|K|` == 0){0}
-          else{split(all_feature_combinations[[`|K|_str`]], col(all_feature_combinations[[`|K|_str`]]))}
+          else{split(all_label_combinations[[`|K|_str`]], col(all_label_combinations[[`|K|_str`]]))}
 
           if(verbose){cat(paste0( # Status update
             "|C| = ", `|C|`, ", |K| = ", `|K|`,
             ", C-K pairs to evaluate = ",
-            prettyNum(n_feature_combinations[as.character(`|C|`)] *
-            n_feature_combinations[as.character(`|K|`)], big.mark = ","),
+            prettyNum(n_label_combinations[as.character(`|C|`)] *
+            n_label_combinations[as.character(`|K|`)], big.mark = ","),
             "\n"))}
 
           prods_and_metrics <- # Pi products and metrics
@@ -291,7 +291,7 @@ mvalpha <-
         }, 1) |> sum(na.rm = TRUE) # sum over |K|
       }, 1) |> sum(na.rm = TRUE) # sum over |C|
 
-    mvDo_boot <-
+    mvDo_boot <- # Bootstrap method described by Krippendorff and Craggs (2016)
       if(!is.null(n_boot)){
         if(parallelize){
           parallel::parLapply(cl, 1:n_boot, function(iter){bootstrap_mvDo()}) |>
@@ -303,16 +303,19 @@ mvalpha <-
     if(parallelize){parallel::stopCluster(cl)}
 
     return(
-      list(
+      new_mvalpha(
         mvalpha = 1 - mvDo / mvDe,
-        bootstrap_mvalpha = 1 - (mvDo_boot / mvDe),
+        type = type,
         mvDo = mvDo,
         mvDe = mvDe,
+        bootstrap_mvalpha = 1 - (mvDo_boot / mvDe),
         unique_cardinalities = unique_cardinalities,
-        features = features,
         units = units,
-        readers = readers,
+        observers = observers,
+        labels = labels,
+        values = values,
         dist_CK = dist_CK,
+        p_CK = p_CK,
         data = data
       )
     )

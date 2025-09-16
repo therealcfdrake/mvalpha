@@ -1,10 +1,9 @@
 #' Published Examples
 #'
-#' These data sets represent the examples found in
-#'  and can be used to confirm the
-#' accurate calculation of alpha.
+#' These data represent examples found in the original paper describing the calculation of multi-valued Krippendorff's alpha by
+#'  Krippendorff and Craggs (2016).
 #'
-#' @format Each is a multi-valued nominal set with readers as columns and units
+#' @format Each is a multi-valued nominal set with observers as columns and units
 #' as rows.
 #' @source <https://doi.org/10.1080/19312458.2016.1228863>
 

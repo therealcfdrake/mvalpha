@@ -7,7 +7,7 @@
 #' @param data a data frame containing a list column for each observer. Each row represents
 #' an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
 #' number of unique values found in the data set. `NA` values are used to represent
-#' missing observations and `NULL` values represent the empty set, {}, of responses.
+#' missing observations and `NULL` values represent the empty set, `{}`, of responses.
 #' @param type a string describing the data type of the label set. This can be "nominal",
 #' "ordinal", "interval", or "ratio" and is used to select the appropriate distance metric.
 #' @param verbose a logical value which toggles whether status updates are printed to
@@ -17,7 +17,7 @@
 #' @param parallelize a logical value indicating whether to implement parallelization
 #' using the `parallel` package.
 #' @param cluster_size an integer describing the number of cores to allocate to parallelization.
-#' If `NULL` and `parallelize = TRUE`, then the maximum number of available cores minus 1 will
+#' If `NULL` and `parallelize=TRUE`, then the maximum number of available cores minus 1 will
 #' be used.
 #' @returns An object of class `mvalpha`
 #' @export

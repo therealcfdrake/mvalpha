@@ -15,6 +15,7 @@ new_mvalpha(
   observers,
   labels,
   values,
+  values_by_unit,
   dist_CK,
   p_CK,
   data
@@ -41,6 +42,8 @@ new_mvalpha(
 \item{labels}{Unique labels used in data}
 
 \item{values}{Unique values used in data}
+
+\item{values_by_unit}{Table of pairable values by unit}
 
 \item{dist_CK}{Distance matrix}
 

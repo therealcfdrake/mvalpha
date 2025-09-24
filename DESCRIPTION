@@ -1,12 +1,13 @@
 Package: mvalpha
 Type: Package
-Title: Calculate Krippendorff's Alpha for Multi-Valued Data
+Title: Krippendorff's Alpha for Multi-Valued Data
 Version: 0.5.0
 Authors@R: c(
     person(
       "Corie", "Drake",
       email = "therealcfdrake@gmail.com",
-      role = c("aut", "cre")
+      role = c("aut", "cre", "cph"),
+      comment = c(ORCID = "0000-0002-1517-7103")
     )
   )
 Description: Calculate Krippendorff's alpha for multi-valued data using the methods 
@@ -14,7 +15,7 @@ Description: Calculate Krippendorff's alpha for multi-valued data using the meth
     Nominal, ordinal, interval, and ratio data types are supported, with options to 
     create bootstrapped estimates of alpha and/or parallelize calculations.
 Roxygen: list(markdown = TRUE)
-License: GPL (>= 3)
+License: AGPL (>= 3)
 Encoding: UTF-8
 URL: https://github.com/therealcfdrake/mvalpha
 BugReports: https://github.com/therealcfdrake/mvalpha/issues

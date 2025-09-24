@@ -36,4 +36,7 @@ ex_table9c
 These data represent examples found in the original paper describing the calculation of multi-valued Krippendorff's alpha by
 Krippendorff and Craggs (2016).
 }
+\references{
+\insertRef{Krippendorff-Craggs-2016}{mvalpha}
+}
 \keyword{datasets}

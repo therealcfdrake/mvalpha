@@ -11,6 +11,9 @@
 
 \item{...}{additional parameters}
 }
+\value{
+invisibly returns the alpha estimate of an mvalpha object
+}
 \description{
 Print generic
 }

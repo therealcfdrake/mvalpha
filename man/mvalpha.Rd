@@ -17,7 +17,7 @@ mvalpha(
 \item{data}{a data frame containing a list column for each observer. Each row represents
 an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
 number of unique values found in the data set. \code{NA} values are used to represent
-missing observations and \code{NULL} values represent the empty set, {}, of responses.}
+missing observations and \code{NULL} values represent the empty set, \code{{}}, of responses.}
 
 \item{type}{a string describing the data type of the label set. This can be "nominal",
 "ordinal", "interval", or "ratio" and is used to select the appropriate distance metric.}
@@ -32,7 +32,7 @@ for mvDo. The default, \code{NULL}, will not generate additional estimates.}
 using the \code{parallel} package.}
 
 \item{cluster_size}{an integer describing the number of cores to allocate to parallelization.
-If \code{NULL} and \code{parallelize = TRUE}, then the maximum number of available cores minus 1 will
+If \code{NULL} and \code{parallelize=TRUE}, then the maximum number of available cores minus 1 will
 be used.}
 }
 \value{

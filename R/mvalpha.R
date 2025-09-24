@@ -314,6 +314,7 @@ mvalpha <-
         observers = observers,
         labels = labels,
         values = values,
+        values_by_unit = values_by_unit,
         dist_CK = dist_CK,
         p_CK = p_CK,
         data = data

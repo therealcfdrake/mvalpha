@@ -10,14 +10,15 @@
 #' @param observers Names of observers
 #' @param labels Unique labels used in data
 #' @param values Unique values used in data
+#' @param values_by_unit Table of pairable values by unit
 #' @param dist_CK Distance matrix
 #' @param p_CK Probability matrix
 #' @param data Data used to calculate mvalpha
 #' @inheritParams mvalpha
-#' @return an mvalpha object
+#' @returns an mvalpha object
 #'
 new_mvalpha <-
-  function(mvalpha, type, mvDo, mvDe, bootstrap_mvalpha, unique_cardinalities, units, observers, labels, values, dist_CK, p_CK, data){
+  function(mvalpha, type, mvDo, mvDe, bootstrap_mvalpha, unique_cardinalities, units, observers, labels, values, values_by_unit, dist_CK, p_CK, data){
     structure(
       .Data = list(
         mvalpha = mvalpha,
@@ -30,6 +31,7 @@ new_mvalpha <-
         observers = observers,
         labels = labels,
         values = values,
+        values_by_unit = values_by_unit,
         dist_CK = dist_CK,
         p_CK = p_CK,
         data = data
@@ -45,6 +47,7 @@ new_mvalpha <-
 #' @param x mvalpha object
 #' @param ... additional parameters
 #' @method print mvalpha
+#' @returns invisibly returns the alpha estimate of an mvalpha object
 #' @export
 
 print.mvalpha <-

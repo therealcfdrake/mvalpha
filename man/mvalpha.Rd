@@ -15,7 +15,7 @@ mvalpha(
 }
 \arguments{
 \item{data}{a data frame containing a list column for each observer. Each row represents
-an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
+an observation unit, and each cell contains a vector of 0 to \code{w} unique values, where \code{w} is the
 number of unique values found in the data set. \code{NA} values are used to represent
 missing observations and \code{NULL} values represent the empty set, \code{{}}, of responses.}
 

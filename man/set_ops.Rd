@@ -14,6 +14,6 @@ set_ops(A, B, type)
 }
 \description{
 Find the intersection and set difference(s) of two sets all at once and more
-efficiently than  calling \code{base::intersect()} and \code{base::setdiff()} separately.
+efficiently than calling \code{base::intersect()} and \code{base::setdiff()} separately.
 Based on this stackoverflow answer \url{https://stackoverflow.com/a/72631719}
 }

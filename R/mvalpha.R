@@ -5,7 +5,7 @@
 #' allowed to apply multiple values to an observation.
 #'
 #' @param data a data frame containing a list column for each observer. Each row represents
-#' an observation unit, and each cell contains a vector of 0 to w unique values, where w is the
+#' an observation unit, and each cell contains a vector of 0 to `w` unique values, where `w` is the
 #' number of unique values found in the data set. `NA` values are used to represent
 #' missing observations and `NULL` values represent the empty set, `{}`, of responses.
 #' @param type a string describing the data type of the label set. This can be "nominal",
@@ -316,8 +316,7 @@ mvalpha <-
         values = values,
         values_by_unit = values_by_unit,
         dist_CK = dist_CK,
-        p_CK = p_CK,
-        data = data
+        p_CK = p_CK
       )
     )
 

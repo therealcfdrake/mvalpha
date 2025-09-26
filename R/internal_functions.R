@@ -1,7 +1,7 @@
 #' Efficient Set Operations
 #'
 #' Find the intersection and set difference(s) of two sets all at once and more
-#' efficiently than  calling `base::intersect()` and `base::setdiff()` separately.
+#' efficiently than calling `base::intersect()` and `base::setdiff()` separately.
 #' Based on this stackoverflow answer <https://stackoverflow.com/a/72631719>
 #' @param A,B sets (vectors) of elements
 #' @inheritParams mvalpha

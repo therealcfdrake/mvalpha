@@ -43,13 +43,16 @@ new_mvalpha(
 
 \item{values}{Unique values used in data}
 
-\item{values_by_unit}{Table of pairable values by unit}
+\item{values_by_unit}{Table of values by unit}
 
-\item{dist_CK}{Distance matrix}
+\item{dist_CK}{Distance matrix for label sets C and K}
 
-\item{p_CK}{Probability matrix}
+\item{p_CK}{Probability matrix for label sets C and K}
 
-\item{data}{Data used to calculate mvalpha}
+\item{data}{a data frame containing a list column for each observer. Each row represents
+an observation unit, and each cell contains a vector of 0 to \code{w} unique values, where \code{w} is the
+number of unique values found in the data set. \code{NA} values are used to represent
+missing observations and \code{NULL} values represent the empty set, \code{{}}, of responses.}
 }
 \value{
 an mvalpha object

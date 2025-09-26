@@ -10,10 +10,9 @@
 #' @param observers Names of observers
 #' @param labels Unique labels used in data
 #' @param values Unique values used in data
-#' @param values_by_unit Table of pairable values by unit
-#' @param dist_CK Distance matrix
-#' @param p_CK Probability matrix
-#' @param data Data used to calculate mvalpha
+#' @param values_by_unit Table of values by unit
+#' @param dist_CK Distance matrix for label sets C and K
+#' @param p_CK Probability matrix for label sets C and K
 #' @inheritParams mvalpha
 #' @returns an mvalpha object
 #'
@@ -33,8 +32,7 @@ new_mvalpha <-
         values = values,
         values_by_unit = values_by_unit,
         dist_CK = dist_CK,
-        p_CK = p_CK,
-        data = data
+        p_CK = p_CK
       ),
       class = "mvalpha"
     )

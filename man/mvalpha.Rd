@@ -4,14 +4,7 @@
 \alias{mvalpha}
 \title{Estimate Multi-Valued Krippendorff's Alpha}
 \usage{
-mvalpha(
-  data,
-  type = "nominal",
-  verbose = TRUE,
-  n_boot = NULL,
-  parallelize = FALSE,
-  cluster_size = NULL
-)
+mvalpha(data, type = "nominal", verbose = TRUE, n_boot = NULL, n_threads = 1)
 }
 \arguments{
 \item{data}{a data frame containing a list column for each observer. Each row represents
@@ -28,12 +21,7 @@ the console while alpha is being calculated.}
 \item{n_boot}{an integer representing the number of bootstrap estimates to calculate
 for mvDo. The default, \code{NULL}, will not generate additional estimates.}
 
-\item{parallelize}{a logical value indicating whether to implement parallelization
-using the \code{parallel} package.}
-
-\item{cluster_size}{an integer describing the number of cores to allocate to parallelization.
-If \code{NULL} and \code{parallelize=TRUE}, then the maximum number of available cores minus 1 will
-be used.}
+\item{n_threads}{an integer describing the number of cores to allocate to parallelization.}
 }
 \value{
 An object of class \code{mvalpha}
@@ -50,20 +38,20 @@ library(mvalpha)
 # View data
 ex_table3
 
-# Estimate alpha
-x <- mvalpha(ex_table3, verbose = TRUE, n_boot = 500)
-
-# View result
-x
-
-# View the unique values observed in the data
-x$values
-
-# View the unique labels used to code the data
-x$labels
-
-# Histogram of bootstrapped estimates
-hist(x$bootstrap_mvalpha)
+# # Estimate alpha
+# x <- mvalpha(ex_table3, verbose = TRUE, n_boot = 500)
+#
+# # View result
+# x
+#
+# # View the unique values observed in the data
+# x$values
+#
+# # View the unique labels used to code the data
+# x$labels
+#
+# # Histogram of bootstrapped estimates
+# hist(x$bootstrap_mvalpha)
 }
 \references{
 \insertRef{Krippendorff-Craggs-2016}{mvalpha}

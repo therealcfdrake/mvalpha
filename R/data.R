@@ -7,7 +7,7 @@
 #' as rows.
 #' @references
 #' \insertRef{Krippendorff-Craggs-2016}{mvalpha}
-#' @source <https://doi.org/10.1080/19312458.2016.1228863>
+#' @source \doi{doi:10.1080/19312458.2016.1228863}
 
 "ex_table3"
 

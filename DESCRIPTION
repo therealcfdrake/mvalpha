@@ -1,7 +1,7 @@
 Package: mvalpha
 Type: Package
 Title: Krippendorff's Alpha for Multi-Valued Data
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: c(
     person(
       "Corie", "Drake",
@@ -24,10 +24,17 @@ Depends:
 RoxygenNote: 7.3.3
 LazyData: true
 Imports:
-  stats,
-  utils,
-  rlang,
-  Rdpack
+    stats,
+    utils,
+    rlang,
+    Rdpack,
+    Rcpp,
+    arrangements,
+    stringr
 Suggests:
-  parallel
+    testthat (>= 3.0.0)
 RdMacros: Rdpack
+LinkingTo: 
+    Rcpp
+Config/testthat/edition: 3
+SystemRequirements: OpenMP

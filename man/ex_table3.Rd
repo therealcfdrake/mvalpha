@@ -15,7 +15,7 @@ Each is a multi-valued nominal set with observers as columns and units
 as rows.
 }
 \source{
-\url{https://doi.org/10.1080/19312458.2016.1228863}
+\doi{doi:10.1080/19312458.2016.1228863}
 }
 \usage{
 ex_table3

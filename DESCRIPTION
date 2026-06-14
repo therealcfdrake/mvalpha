@@ -12,8 +12,8 @@ Authors@R: c(
   )
 Description: Calculate Krippendorff's alpha for multi-valued data using the methods 
     introduced by Krippendorff and Craggs (2016) <doi:10.1080/19312458.2016.1228863>.
-    Nominal, ordinal, interval, and ratio data types are supported, with options to 
-    create bootstrapped estimates of alpha and/or parallelize calculations.
+    Nominal, ordinal, interval, and ratio data types are supported, with option to 
+    create bootstrapped estimates of alpha.
 Roxygen: list(markdown = TRUE)
 License: AGPL (>= 3)
 Encoding: UTF-8

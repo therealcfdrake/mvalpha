@@ -31,6 +31,8 @@
 mvalpha <-
   function(data, type = "nominal", verbose = TRUE, n_boot = NULL, n_threads = 1){
 
+    if(type != "nominal") warning("Data types other than nominal have not been thoroughly tested. Use with caution.")
+
     bootstrap_mvDo <-
       function(){
         vapply(units[which(m != 0)], function(u){

@@ -1,6 +1,8 @@
 // [[Rcpp::plugins(openmp)]]
 #include <Rcpp.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <vector>
 #include <numeric>
 #include <cmath>
@@ -260,10 +262,17 @@ double calc_pair_parallel(
 
   double sum_prod = 0.0, sum_weighted = 0.0;
 
+#ifdef _OPENMP
 #pragma omp parallel reduction(+:sum_prod, sum_weighted) num_threads(n_threads)
+#endif
 {
+#ifdef _OPENMP
   int thread_id = omp_get_thread_num();
   int n_actual  = omp_get_num_threads();
+#else
+  int thread_id = 0;
+  int n_actual  = 1;
+#endif
 
   // each thread handles a contiguous chunk of C combinations
   long long chunk = (n_C + n_actual - 1) / n_actual;
